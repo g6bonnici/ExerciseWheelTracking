@@ -78,9 +78,12 @@ dateFinal = dateshift(dateFinal, 'start', 'minute');
 
 %% 
 
+
 % Analysis
 
 dayStart = find(timeofday(dateFinal) == hours(20));
+
+activeHours = 10; %indicates how long the active period is. Most likely either 10 or 12.
 
 %Initialize storage for valid periods
 finalDays = [];
@@ -93,9 +96,8 @@ for i = 1:length(dayStart)-1
 
     timeDiff = hours(dateFinal(endIdx) - dateFinal(startIdx));
 
-    activeEnd = dateFinal(startIdx) + hours(10);
-    activeEndIdx = dayStart(i) + 600;
-
+    activeEnd = dateFinal(startIdx) + hours(activeHours);
+    activeEndIdx = dayStart(i) + (activeHours * 60);
 
 
     if dateFinal(startIdx) < endDate
@@ -109,13 +111,13 @@ for i = 1:length(dayStart)-1
 
                 for w = 1:size(finalWheel,2)  
 
-                    activeMissing = 600 - sum(finalWheel(startIdx:activeEndIdx, w) == 0.1);
+                    activeMissing = (activeHours * 60) - sum(finalWheel(startIdx:activeEndIdx, w) == 0.1);
 
                             if activeMissing <= 120   %to prevent divide by zero error
-                                activeMissing = 600;
+                                activeMissing = (activeHours * 60);
                             end
 
-                    activeMissingWheels (goodDay,w)  =  activeMissing / 600;
+                    activeMissingWheels (goodDay,w)  =  activeMissing / (activeHours * 60);
 
                     sleepMissing = (endIdx- activeEndIdx) - sum(finalWheel(activeEndIdx:endIdx, w) == 0.1);
                     
